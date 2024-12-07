@@ -1,2 +1,9 @@
+/bin/
+
 /files
-/.vscode
+/log/
+
+/log/latest
+/log/latest_list
+
+/log/*.log

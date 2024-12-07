@@ -16,14 +16,27 @@ private:
 
 public:
     State() = default;
-    State(int, vector<int>, vector<int>, vector<int>, bool, bool);
+    State(int state_name, vector<int> zero_transtions, vector<int> one_transitions, vector<int> epsilon_transitions, bool, bool);
+    State(int state_name, vector<int> zero_transtions, vector<int> one_transitions, bool, bool);
+    State(int state_name);
     ~State();
     vector<int> get_transition_one();
     vector<int> get_transition_zero();
     vector<int> get_transition_epsilon();
     bool get_is_final();
     bool get_is_start();
-    int get_state_name();
+    void set_transition_one(vector<int> s)
+    {
+        this->transition_one = s;
+    }
+    void set_transition_zero(vector<int> s)
+    {
+        this->transition_zero = s;
+    }
+    int get_state_name() const
+    {
+        return state_name;
+    }
     bool is_there_any_transition_epsilon();
     void print_int_vector();
     // map fonksiyonları için gerekli
@@ -52,6 +65,19 @@ State::State(int state_name, vector<int> transition_zero, vector<int> transition
     this->is_final = is_final;
     this->is_start = is_start;
 }
+State::State(int state_name, vector<int> transition_zero, vector<int> transition_one, bool is_start = false, bool is_final = false)
+{
+    this->state_name = state_name;
+    this->transition_one = transition_one;
+    this->transition_zero = transition_zero;
+    this->is_final = is_final;
+    this->is_start = is_start;
+}
+State::State(int state_name)
+{
+    this->state_name = state_name;
+}
+
 State::~State()
 {
 }
@@ -75,10 +101,10 @@ bool State::get_is_start()
 {
     return this->is_start;
 }
-int State::get_state_name()
-{
-    return this->state_name;
-}
+// const int State::get_state_name()
+// {
+//     return this->state_name;
+// }
 bool State::is_there_any_transition_epsilon()
 {
     return transition_epsilon.size() > 0;

@@ -1,5 +1,9 @@
 #include <iostream>
 #include "epsilon_nfa.hpp"
+#include "dfa.hpp"
+#include "nfa.hpp"
+#include <cstdlib> // system()
+
 using namespace std;
 
 int main()
@@ -20,15 +24,18 @@ int main()
     vector<State> nfa1_states = {state_1, state_2, state_3, state_4, state_5};
     vector<State> nfa2_states = {state_6, state_7, state_8, state_9, state_10};
 
-    epsilon_NFA nfa(nfa1_states);
+    epsilon_NFA e_nfa(nfa1_states);
     epsilon_NFA nfa2(nfa2_states);
-    nfa.print_epsilon_nfa_table();
-    nfa.calculate_s_prime_0();
-    nfa.calculate_s_prime_1();
+    // e_nfa.print_epsilon_nfa_table();
+    e_nfa.calculate_s_prime_0();
+    e_nfa.calculate_s_prime_1();
     cout << "-----------" << endl;
-    nfa2.print_epsilon_nfa_table();
-    nfa2.calculate_s_prime_0();
-    nfa2.calculate_s_prime_1();
+    NFA nfa(e_nfa);
+    system("clear");
+    nfa.print_map();
+    // nfa2.print_epsilon_nfa_table();
+    // nfa2.calculate_s_prime_0();
+    // nfa2.calculate_s_prime_1();
 
     return 0;
 }
