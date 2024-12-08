@@ -2,7 +2,7 @@
 #define EPSILON_NFA__HPP
 #include <iostream>
 #include <vector>
-#include <iomanip> // setw fonksiyonu için gerekli
+#include <iomanip>
 #include <map>
 #include "state.hpp"
 
@@ -11,9 +11,9 @@ class epsilon_NFA
 private:
     vector<State> all_states;
     State state_name_to_state(int state_name);
-    vector<State> const get_ones_transtion_states(State s);
-    vector<State> const get_zeros_transtion_states(State s);
-    vector<State> const get_epsilon_transtion_states(State s);
+    vector<State> get_ones_transtion_states(State s);
+    vector<State> get_zeros_transtion_states(State s);
+    vector<State> get_epsilon_transtion_states(State s);
     vector<State> get_s_prime(vector<State> list, bool is_get_zeros);
 
 public:
@@ -24,14 +24,17 @@ public:
 
     epsilon_NFA();
     epsilon_NFA(vector<State> all_states);
+    ~epsilon_NFA();
+
     void calculate_s_prime_0();
     void calculate_s_prime_1();
     void print_epsilon_nfa_table();
     void print_map(map<State, vector<State>> mp);
-    ~epsilon_NFA();
 };
 void print_vector(vector<State> v);
+
 epsilon_NFA::epsilon_NFA() {}
+
 epsilon_NFA::epsilon_NFA(vector<State> all_states)
 {
     this->all_states = all_states;
@@ -188,7 +191,7 @@ vector<State> epsilon_NFA::get_s_prime(vector<State> epsilon_list, bool is_get_z
     return list2;
 }
 
-vector<State> const epsilon_NFA::get_zeros_transtion_states(State s) // sıkıntı burada
+vector<State> epsilon_NFA::get_zeros_transtion_states(State s) // sıkıntı burada
 {
     vector<State> list;
     for (int i = 0; i < s.get_transition_zero().size(); i++)
@@ -197,7 +200,7 @@ vector<State> const epsilon_NFA::get_zeros_transtion_states(State s) // sıkınt
     }
     return list;
 }
-vector<State> const epsilon_NFA::get_ones_transtion_states(State s) // sıkıntı burada
+vector<State> epsilon_NFA::get_ones_transtion_states(State s) // sıkıntı burada
 {
     vector<State> list;
     for (int i = 0; i < s.get_transition_one().size(); i++)
@@ -245,7 +248,7 @@ epsilon_NFA::~epsilon_NFA()
 {
 }
 
-vector<State> const epsilon_NFA::get_epsilon_transtion_states(State s)
+vector<State> epsilon_NFA::get_epsilon_transtion_states(State s)
 {
     vector<State> list;
     for (int i = 0; i < s.get_transition_epsilon().size(); i++)
