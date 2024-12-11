@@ -2,6 +2,10 @@
 #define STATE_HPP
 #include <vector>
 #include <string>
+#include <set>
+#include <iomanip>
+#include <map>
+
 using namespace std;
 
 class State
@@ -29,8 +33,8 @@ public:
     int get_state_name() const;
     vector<int> get_transition_one();
     vector<int> get_transition_zero();
-    vector<int> get_transition_epsilon();
-    bool is_there_any_transition_epsilon();
+    vector<int> get_transition_epsilon() const;
+    bool is_there_any_transition_epsilon() const;
 
     void set_transition_one(vector<int> s)
     {
@@ -92,7 +96,7 @@ vector<int> State::get_transition_zero()
 {
     return this->transition_zero;
 }
-vector<int> State::get_transition_epsilon()
+vector<int> State::get_transition_epsilon() const
 {
     return this->transition_epsilon;
 }
@@ -108,7 +112,7 @@ int State::get_state_name() const
 {
     return this->state_name;
 }
-bool State::is_there_any_transition_epsilon()
+bool State::is_there_any_transition_epsilon() const
 {
     return transition_epsilon.size() > 0;
 }

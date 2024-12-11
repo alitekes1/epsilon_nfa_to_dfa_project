@@ -16,7 +16,7 @@ private:
 public:
     State start_state;
     vector<State> all_states;
-    vector<State> final_states;
+    set<State> final_states;
     map<State, pair<State, State>> all;
 
     DFA(epsilon_NFA e_nfa);
@@ -24,20 +24,27 @@ public:
     void print_map();
     void print_nfa_table();
     bool check_is_final(int st_name);
-    int states_to_state(vector<State> s);
-    State calculate_s_prime_0(vector<State> s);
-    State calculate_s_prime_1(vector<State> s);
-    vector<State> get_reachable_states(State n);
-    vector<State> get_s_prime_0_of_state(State s);
-    vector<State> get_s_prime_1_of_state(State s);
+    int states_to_state(set<State> s);
+    State calculate_s_prime_0(set<State> s);
+    State calculate_s_prime_1(set<State> s);
+    set<State> get_reachable_states(State n);
+    set<State> get_s_prime_0_of_state(State s);
+    set<State> get_s_prime_1_of_state(State s);
 };
 void DFA::print_map()
 {
+    bool temp = true;
     for (const auto &pair : all)
     {
         if (check_is_final(pair.first.get_state_name()))
         {
             pair.first.set_final();
+        }
+        if ((pair.second.first.get_state_name() == 0 || pair.second.second.get_state_name() == 0) && temp)
+        {
+            State dead_state(0, {0}, {0}, 0, 0);
+            all[dead_state] = make_pair(dead_state, dead_state);
+            temp = false; // sadece 1 defa death state i eklemeyi kontrol etmek için.
         }
     }
     for (const auto &[key, value] : all)
@@ -57,11 +64,11 @@ DFA::DFA(epsilon_NFA e_nfa)
 
     calculate_DFA();
 }
-vector<State> DFA::get_s_prime_0_of_state(State s)
+set<State> DFA::get_s_prime_0_of_state(State s)
 {
     return e_nfa.s_prime_0[s];
 }
-vector<State> DFA::get_s_prime_1_of_state(State s)
+set<State> DFA::get_s_prime_1_of_state(State s)
 {
     return e_nfa.s_prime_1[s];
 }
@@ -76,15 +83,15 @@ vector<int> getDigits(int number)
 
     return digits;
 }
-vector<State> DFA::get_reachable_states(State s)
+set<State> DFA::get_reachable_states(State s)
 {
-    vector<State> list;
+    set<State> list;
     vector<int> number_list = getDigits(s.get_state_name());
     for (int i = 0; i < number_list.size(); i++)
     {
         if (!is_exist_in_vector(list, number_list.at(i)))
         {
-            list.push_back(state_name_to_state(number_list.at(i)));
+            list.insert(state_name_to_state(number_list.at(i)));
         }
     }
     return list;
@@ -134,18 +141,20 @@ void DFA::calculate_DFA()
         all[cur_state] = make_pair(new_state_0, new_state_1);
         temp.erase(temp.begin());
     }
-
-    State dead_state(0, {0}, {0}, 0, 0);
-    all[dead_state] = make_pair(dead_state, dead_state);
+    // if ()
+    // {
+    //     State dead_state(0, {0}, {0}, 0, 0);
+    //     all[dead_state] = make_pair(dead_state, dead_state);
+    // }
 }
 
-State DFA::calculate_s_prime_0(vector<State> s_list)
+State DFA::calculate_s_prime_0(set<State> s_list)
 {
-    vector<State> prime_list;
-    for (int i = 0; i < s_list.size(); i++)
+    set<State> prime_list;
+    for (auto &value : s_list)
     {
-        vector<State> temp = get_s_prime_0_of_state(s_list[i]);
-        prime_list.insert(prime_list.end(), temp.begin(), temp.end());
+        set<State> temp = get_s_prime_0_of_state(value);
+        prime_list.insert(temp.begin(), temp.end());
     }
     int st_name = 0;
     if (prime_list.size() != 0)
@@ -156,13 +165,13 @@ State DFA::calculate_s_prime_0(vector<State> s_list)
     return new_state;
 }
 
-State DFA::calculate_s_prime_1(vector<State> s_list)
+State DFA::calculate_s_prime_1(set<State> s_list)
 {
-    vector<State> prime_list;
-    for (int i = 0; i < s_list.size(); i++)
+    set<State> prime_list;
+    for (State value : s_list)
     {
-        auto temp = get_s_prime_1_of_state(s_list[i]);
-        prime_list.insert(prime_list.end(), temp.begin(), temp.end());
+        auto temp = get_s_prime_1_of_state(value);
+        prime_list.insert(temp.begin(), temp.end());
     }
     int st_name = 0;
     if (prime_list.size() != 0)
@@ -173,12 +182,12 @@ State DFA::calculate_s_prime_1(vector<State> s_list)
     return new_state;
 }
 
-int DFA::states_to_state(vector<State> s_0)
+int DFA::states_to_state(set<State> s_0)
 {
     set<int> unique_states;
-    for (int i = 0; i < s_0.size(); i++)
+    for (State value : s_0)
     {
-        unique_states.insert(s_0.at(i).get_state_name());
+        unique_states.insert(value.get_state_name());
     }
     string st_name = "";
     for (int state : unique_states)

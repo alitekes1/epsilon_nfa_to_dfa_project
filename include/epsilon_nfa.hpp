@@ -14,13 +14,13 @@ private:
     vector<State> get_ones_transtion_states(State s);
     vector<State> get_zeros_transtion_states(State s);
     vector<State> get_epsilon_transtion_states(State s);
-    vector<State> get_s_prime(vector<State> list, bool is_get_zeros);
+    set<State> get_s_prime(vector<State> list, bool is_get_zeros);
 
 public:
     State start_state;
-    vector<State> final_states;
-    map<State, vector<State>> s_prime_0;
-    map<State, vector<State>> s_prime_1;
+    set<State> final_states;
+    map<State, set<State>> s_prime_0;
+    map<State, set<State>> s_prime_1;
 
     epsilon_NFA();
     epsilon_NFA(vector<State> all_states);
@@ -29,7 +29,7 @@ public:
     void calculate_s_prime_0();
     void calculate_s_prime_1();
     void print_epsilon_nfa_table();
-    void print_map(map<State, vector<State>> mp);
+    void print_map(map<State, set<State>> mp);
 };
 void print_vector(vector<State> v);
 
@@ -43,7 +43,7 @@ epsilon_NFA::epsilon_NFA(vector<State> all_states)
         State current_state = all_states.at(i);
         if (current_state.get_is_final())
         {
-            final_states.push_back(current_state);
+            final_states.insert(current_state);
         }
         if (current_state.get_is_start())
         {
@@ -53,12 +53,13 @@ epsilon_NFA::epsilon_NFA(vector<State> all_states)
 }
 void epsilon_NFA::print_epsilon_nfa_table()
 {
+    int colWidth = 7;
+    cout << setw(colWidth) << setw(colWidth) << "S TABLE" << endl;
     const int rows = all_states.size();
     const int cols = 5;
 
     string colNames[cols] = {"S(q,0)", "S(q,1)", "S(q,ε)", "S*(q,0)", "S*(q,1)"};
 
-    int colWidth = 10;
     cout << "+----------+----------+----------+----------+----------+" << endl;
     cout << "|";
     cout << setw(colWidth) << " ";
@@ -74,37 +75,53 @@ void epsilon_NFA::print_epsilon_nfa_table()
         State temp = all_states.at(i);
         cout << "|" << setw(colWidth) << temp.get_state_name() << "|" << setw(colWidth);
 
-        for (int i = 0; i < temp.get_transition_zero().size(); i++)
+        for (int value : temp.get_transition_zero())
         {
-            cout << temp.get_transition_zero().at(i) << ",";
+            cout << value << ",";
         }
         cout << "|" << setw(colWidth);
-        for (int i = 0; i < temp.get_transition_one().size(); i++)
+        for (int value : temp.get_transition_one())
         {
-            cout << temp.get_transition_one().at(i) << ",";
+            cout << value << ",";
         }
         cout << "|" << setw(colWidth);
-        for (int i = 0; i < temp.get_transition_epsilon().size(); i++)
+        for (int value : temp.get_transition_epsilon())
         {
-            cout << temp.get_transition_epsilon().at(i) << ",";
+            cout << value << ",";
         }
-
-        // cout << "|" << setw(colWidth);
-        // for (int i = 0; i < temp.get_transition_one().size(); i++)
-        // {
-        //     cout << temp.get_transition_one().at(i) << ",";
-        // }
         cout << "|" << setw(colWidth);
+        for (const auto &pair : s_prime_0)
+        {
+            if (pair.first == temp)
+            {
+                for (State s : pair.second)
+                {
+                    cout << s.get_state_name() << ",";
+                }
+            }
+        }
+        cout << "|" << setw(colWidth);
+        for (const auto &pair : s_prime_1)
+        {
+            if (pair.first == temp)
+            {
+                for (State s : pair.second)
+                {
+                    cout << s.get_state_name() << ",";
+                }
+            }
+        }
         cout << "|" << endl
              << "+----------+----------+----------+----------+----------+" << endl;
     }
+    getchar();
 }
 
-bool is_exist_in_vector(std::vector<State> &vec, int currrent_state_name)
+bool is_exist_in_vector(set<State> &vec, int currrent_state_name)
 {
-    for (int i = 0; i < vec.size(); i++)
+    for (auto &value : vec)
     {
-        if (vec.at(i).get_state_name() == currrent_state_name)
+        if (value.get_state_name() == currrent_state_name)
         {
             return true;
         }
@@ -118,7 +135,6 @@ void epsilon_NFA::calculate_s_prime_1()
         State current_state = all_states.at(i);
 
         vector<State> epsilon_transitions_of_current_state = get_epsilon_transtion_states(current_state);
-        epsilon_transitions_of_current_state.push_back(current_state); // kendine de boşlukla gidebiliyor.
         s_prime_1[current_state] = get_s_prime(epsilon_transitions_of_current_state, false);
     }
     cout << "S PRIME 1" << endl;
@@ -135,7 +151,6 @@ void epsilon_NFA::calculate_s_prime_0()
         State current_state = all_states.at(i);
 
         vector<State> epsilon_transitions_of_current_state = get_epsilon_transtion_states(current_state);
-        epsilon_transitions_of_current_state.push_back(current_state); // kendine de boşlukla gidebiliyor.
         s_prime_0[current_state] = get_s_prime(epsilon_transitions_of_current_state, true);
     }
     cout << "S PRIME 0" << endl;
@@ -145,50 +160,82 @@ void epsilon_NFA::calculate_s_prime_0()
          << endl
          << endl;
 }
-vector<State> epsilon_NFA::get_s_prime(vector<State> epsilon_list, bool is_get_zeros)
+set<State> epsilon_NFA::get_s_prime(vector<State> epsilon_list, bool is_get_zeros)
 {
-    vector<State> list2;
-    for (int i = 0; i < epsilon_list.size(); i++)
-    {
-        State current_state = epsilon_list.at(i);
-        if (current_state.get_transition_zero().size() > 0 && is_get_zeros)
-        {
-            vector<State> temp = get_zeros_transtion_states(current_state);
-            list2.insert(list2.end(), temp.begin(), temp.end());
-        }
-        else if (current_state.get_transition_one().size() > 0 && !is_get_zeros)
-        {
-            vector<State> temp = get_ones_transtion_states(current_state);
-            list2.insert(list2.end(), temp.begin(), temp.end());
-        }
-        for (int j = 0; j < current_state.get_transition_epsilon().size(); j++)
-        {
-            vector<State> temp2 = get_epsilon_transtion_states(current_state); // burada sorgula.
-            for (int k = 0; k < temp2.size(); k++)
-            {
-                if (!is_exist_in_vector(list2, temp2.at(k).get_state_name()))
-                {
-                    epsilon_list.push_back(temp2.at(k));
-                }
-            }
-        }
-    }
-    for (int j = 0; j < list2.size(); j++)
-    {
-        if (list2.at(j).get_transition_epsilon().size() > 0)
-        {
-            vector<State> temp2 = get_epsilon_transtion_states(list2.at(j));
+    // ilk a lara bakıp sonra epsilonlara bakmalıyız.
+    set<State> prime_list;
+    set<State> prime_list2;
+    prime_list2.insert(epsilon_list.begin(), epsilon_list.end());
 
-            for (int k = 0; k < temp2.size(); k++)
+    for (State state : prime_list2)
+    {
+        if (state.is_there_any_transition_epsilon())
+        {
+            vector<State> episode1 = get_epsilon_transtion_states(state);
+            for (State value : episode1)
             {
-                if (!is_exist_in_vector(list2, temp2.at(k).get_state_name()))
+                prime_list2.insert(value);
+            }
+
+            for (State value1 : prime_list2)
+            {
+                if (value1.is_there_any_transition_epsilon())
                 {
-                    list2.push_back(temp2.at(k));
+                    vector<State> episode2 = get_epsilon_transtion_states(value1);
+                    for (State value2 : episode2)
+                    {
+                        prime_list2.insert(value2);
+                    }
                 }
             }
         }
     }
-    return list2;
+    for (State value : prime_list2)
+    {
+        vector<State> list;
+        if (is_get_zeros)
+        {
+            list = get_zeros_transtion_states(value);
+            for (State value : list)
+            {
+                prime_list.insert(value);
+            }
+        }
+        else
+        {
+            list = get_ones_transtion_states(value);
+            for (State value : list)
+            {
+                prime_list.insert(value);
+            }
+        }
+    }
+    /*
+     */
+    for (State state : prime_list)
+    {
+        if (state.is_there_any_transition_epsilon())
+        {
+            vector<State> episode1 = get_epsilon_transtion_states(state);
+            for (State value : episode1)
+            {
+                prime_list.insert(value);
+            }
+
+            for (State value1 : prime_list)
+            {
+                if (value1.is_there_any_transition_epsilon())
+                {
+                    vector<State> episode2 = get_epsilon_transtion_states(value1);
+                    for (State value2 : episode2)
+                    {
+                        prime_list.insert(value2);
+                    }
+                }
+            }
+        }
+    }
+    return prime_list;
 }
 
 vector<State> epsilon_NFA::get_zeros_transtion_states(State s) // sıkıntı burada
@@ -222,14 +269,11 @@ State epsilon_NFA::state_name_to_state(int state_name)
     throw std::runtime_error("State not found for the given state_name: " + std::to_string(state_name));
 }
 
-void epsilon_NFA::print_map(map<State, vector<State>> map)
+void epsilon_NFA::print_map(map<State, set<State>> map)
 {
     for (const auto &pair : map)
     {
-        // Anahtar (State) yazdırma
         std::cout << "State:" << pair.first << ":";
-
-        // Değer (vector<State>) yazdırma
         for (const auto &state : pair.second)
         {
             std::cout << state << " ";
@@ -251,6 +295,7 @@ epsilon_NFA::~epsilon_NFA()
 vector<State> epsilon_NFA::get_epsilon_transtion_states(State s)
 {
     vector<State> list;
+    list.push_back(s);
     for (int i = 0; i < s.get_transition_epsilon().size(); i++)
     {
         list.push_back(state_name_to_state(s.get_transition_epsilon().at(i)));
