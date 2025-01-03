@@ -16,16 +16,13 @@ Map: To represent transitions between states.
 
 An epsilon-NFA allows multiple state transitions with epsilon transitions (empty transitions). This project aims to eliminate epsilon transitions and convert the automaton into a deterministic format (DFA) for easier analysis.
 
-#### ⚙️ Installation and Usage
+<br>
+<br>
 
-Clone the GitHub repository to run the project:
+---
 
-- git clone https://github.com/alitekes1/epsilon_nfa_to_dfa_project.git
-- cd epsilon_nfa_to_dfa_project
-
-Input Format: The project accepts definitions of epsilon-NFA. The input format for epsilon-NFA can be reviewed in the "main.cpp" file.
-
-Results: The converted DFA can be viewed in the console.
+<br>
+<br>
 
 # Epsilon NFA'yı DFA'ya Dönüşüm Projesi
 
@@ -45,15 +42,5 @@ Map: Durumlar arasındaki geçiş işlemlerini temsil etmek için.
 
 Epsilon-NFA, epsilon geçişleri (boş geçişler) ile çoklu durum geçişlerine izin verir. Bu proje, epsilon geçişlerini ortadan kaldırıp, dönüştürülen otomatı deterministik bir formata (DFA) dönüştürerek daha basit bir şekilde analiz etmeyi sağlar.
 
-#### ⚙️ Kurulum ve Kullanım
-
-Bu projeyi çalıştırmak için, GitHub deposunu klonlayın:
-
-- git clone https://github.com/alitekes1/epsilon_nfa_to_dfa_project.git
-- cd epsilon_nfa_to_dfa_project
-
-Girdi Formatı: Proje, epsilon-NFA tanımlarını kabul eder. Epsilon NFA için girdi formatı için "main.cpp" dosyası incelenebilir.
-
-Sonuçlar: Dönüştürülmüş DFA'ı konsolda görüntüleyebilirsiniz.
 
 
