@@ -12,11 +12,11 @@ class State
 {
 private:
     int state_name;
+    mutable bool is_start;
+    mutable bool is_final;
     vector<int> transition_one;
     vector<int> transition_zero;
     vector<int> transition_epsilon;
-    bool is_start;
-    mutable bool is_final;
 
 public:
     State() = default;
@@ -27,6 +27,7 @@ public:
     ~State();
 
     void set_final() const;
+    void set_start() const;
     void print_int_vector();
     bool get_is_start() const;
     bool get_is_final() const;
@@ -63,6 +64,11 @@ public:
 
 State::State(int state_name, vector<int> transition_zero, vector<int> transition_one, vector<int> transition_epsilon, bool is_start, bool is_final)
 {
+    if (state_name == 0)
+    {
+        cout << "State Name 0 olamaz. 1'den başlamasi gerekiyor." << endl;
+        return;
+    }
     this->state_name = state_name;
     this->transition_one = transition_one;
     this->transition_zero = transition_zero;
@@ -84,7 +90,6 @@ State::State(int state_name)
     this->is_final = false;
     this->is_start = false;
 }
-
 State::~State()
 {
 }
@@ -126,5 +131,9 @@ void State::print_int_vector()
 void State::set_final() const
 {
     this->is_final = 1;
+}
+void State::set_start() const
+{
+    this->is_start = 1;
 }
 #endif

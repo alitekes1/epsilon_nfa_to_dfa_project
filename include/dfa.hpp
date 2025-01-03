@@ -9,9 +9,13 @@ private:
     epsilon_NFA e_nfa;
     void calculate_DFA();
     bool is_exist_in_map(int stn);
+    set<State> get_reachable_states(State n);
     State state_name_to_state(int state_name);
+    set<State> get_s_prime_0_of_state(State s);
+    set<State> get_s_prime_1_of_state(State s);
     vector<State> const get_ones_transtion_state(State s);
     vector<State> const get_zeros_transtion_state(State s);
+    State determine_start_state();
 
 public:
     State start_state;
@@ -27,9 +31,6 @@ public:
     int states_to_state(set<State> s);
     State calculate_s_prime_0(set<State> s);
     State calculate_s_prime_1(set<State> s);
-    set<State> get_reachable_states(State n);
-    set<State> get_s_prime_0_of_state(State s);
-    set<State> get_s_prime_1_of_state(State s);
 };
 void DFA::print_map()
 {
@@ -59,9 +60,8 @@ DFA::DFA(epsilon_NFA e_nfa)
 {
     this->e_nfa = e_nfa;
     this->final_states = e_nfa.final_states;
-    this->start_state = e_nfa.start_state;
+    this->start_state = determine_start_state();
     all_states.push_back(start_state);
-
     calculate_DFA();
 }
 set<State> DFA::get_s_prime_0_of_state(State s)
@@ -119,6 +119,17 @@ bool DFA::check_is_final(int st_name)
     }
     return false;
 }
+State DFA::determine_start_state()
+{
+    vector<State> list = e_nfa.get_epsilon_transtion_states(e_nfa.start_state);
+    list.push_back(e_nfa.start_state);
+    set<State> start_set;
+    start_set.insert(list.begin(), list.end());
+    int state_name = states_to_state(start_set);
+    State st_state(state_name);
+    st_state.set_start();
+    return st_state;
+}
 void DFA::calculate_DFA()
 {
     auto temp = all_states;
@@ -141,11 +152,6 @@ void DFA::calculate_DFA()
         all[cur_state] = make_pair(new_state_0, new_state_1);
         temp.erase(temp.begin());
     }
-    // if ()
-    // {
-    //     State dead_state(0, {0}, {0}, 0, 0);
-    //     all[dead_state] = make_pair(dead_state, dead_state);
-    // }
 }
 
 State DFA::calculate_s_prime_0(set<State> s_list)

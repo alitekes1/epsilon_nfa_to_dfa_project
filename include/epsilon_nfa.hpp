@@ -13,7 +13,6 @@ private:
     State state_name_to_state(int state_name);
     vector<State> get_ones_transtion_states(State s);
     vector<State> get_zeros_transtion_states(State s);
-    vector<State> get_epsilon_transtion_states(State s);
     set<State> get_s_prime(vector<State> list, bool is_get_zeros);
 
 public:
@@ -30,6 +29,7 @@ public:
     void calculate_s_prime_1();
     void print_epsilon_nfa_table();
     void print_map(map<State, set<State>> mp);
+    vector<State> get_epsilon_transtion_states(State s);
 };
 void print_vector(vector<State> v);
 
@@ -114,7 +114,6 @@ void epsilon_NFA::print_epsilon_nfa_table()
         cout << "|" << endl
              << "+----------+----------+----------+----------+----------+" << endl;
     }
-    getchar();
 }
 
 bool is_exist_in_vector(set<State> &vec, int currrent_state_name)
@@ -137,12 +136,6 @@ void epsilon_NFA::calculate_s_prime_1()
         vector<State> epsilon_transitions_of_current_state = get_epsilon_transtion_states(current_state);
         s_prime_1[current_state] = get_s_prime(epsilon_transitions_of_current_state, false);
     }
-    cout << "S PRIME 1" << endl;
-    print_map(s_prime_1);
-    cout << endl
-         << endl
-         << endl
-         << endl;
 }
 void epsilon_NFA::calculate_s_prime_0()
 {
@@ -153,12 +146,6 @@ void epsilon_NFA::calculate_s_prime_0()
         vector<State> epsilon_transitions_of_current_state = get_epsilon_transtion_states(current_state);
         s_prime_0[current_state] = get_s_prime(epsilon_transitions_of_current_state, true);
     }
-    cout << "S PRIME 0" << endl;
-    print_map(s_prime_0);
-    cout << endl
-         << endl
-         << endl
-         << endl;
 }
 set<State> epsilon_NFA::get_s_prime(vector<State> epsilon_list, bool is_get_zeros)
 {
@@ -210,8 +197,6 @@ set<State> epsilon_NFA::get_s_prime(vector<State> epsilon_list, bool is_get_zero
             }
         }
     }
-    /*
-     */
     for (State state : prime_list)
     {
         if (state.is_there_any_transition_epsilon())
